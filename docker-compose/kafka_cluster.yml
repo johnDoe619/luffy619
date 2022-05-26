@@ -1,0 +1,96 @@
+# coming to kafka cluster yml file , we have one zookeper, schema-registry, and kafka contianers defined
+# zookeper is required to hold metadata for a cluster and organzie/manage the cluster,  and play role on determining the direction and cluster health
+# Here zoopkeepr manages the cluster of Kafka brokers
+# schema registry is used to register a schema for a kafka topic, and it will check the producers and consumers to force them to use the registered schema so that only allowed schema will be used
+# producers and cosumers checks schema with id and catch the results before sending any receiving data, so its one time request using camera history, and subsequent request is done by using cache
+# schema registry also allows backwards and forward compatibility
+# finally we have 3 kafka containers defined in kafka cluseter yml file, each use same confluentic kafka image while ports are different
+# why do we have 3 containers, which is acutially three kafka brokers ? -- it is to accoomplicsh the conceot of Quorum(set the minm number of brokers to create a newtowrk), which indicates the minimn number of members necessary to conduct a business in a group, and in kafka terms it will prvent split brain issue which can occur on network split occurs
+# kafka broker service definiton prop:
+# 1. you set a unique id
+# 2. set a zookeper url, which is necessary to reach the zookeper fo rmetadeta and url
+# 3. we have 2 listerners here, one for internal communication and one for accessing the clusters outsode of containers which will use the exposed ports
+# for example: for kakfa broker 1 expose port is 19092, it means we can reach this container from outside using localhost:19092
+# while inside the docker we will reach to these containers using hostname defined in docker compose file which is kafka-broker-1 and for port we use 9092 for internal communication
+# finally we define the comperssion type as producer here which is the process of compressing the data entrace as we talked on the kafka and producer section
+version: '3.7'
+services:
+  zookeeper:
+    image: confluentinc/cp-zookeeper:${KAFKA_VERSION:-latest}
+    hostname: zookeeper
+    ports:
+      - "2181:2181"
+    environment:
+      ZOOKEEPER_SERVER_ID: 1
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+      ZOOKEEPER_INIT_LIMIT: 5
+      ZOOKEEPER_SYNC_LIMIT: 2
+      ZOOKEEPER_SERVERS: zookeeper:2888:3888
+    networks:
+      - ${GLOBAL_NETWORK:-kafka}
+  schema-registry:
+    image: confluentinc/cp-schema-registry:${KAFKA_VERSION}
+    hostname: schema-registry
+    depends_on:
+      - zookeeper
+      - kafka-broker-1
+      - kafka-broker-2
+      - kafka-broker-3
+    ports:
+      - "8081:8081"
+    environment:
+      SCHEMA_REGISTRY_HOST_NAME: schema-registry
+      SCHEMA_REGISTRY_KAFKASTORE_CONNECTION_URL: 'zookeeper:2181'
+      SCHEMA_REGISTRY_LISTENERS: http://schema-registry:8081
+      SCHEMA_REGISTRY_DEBUG: 'true'
+    networks:
+      - ${GLOBAL_NETWORK:-kafka}
+  kafka-broker-1:
+    image: confluentinc/cp-kafka:${KAFKA_VERSION}
+    hostname: kafka-broker-1
+    ports:
+      - "19092:19092"
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka-broker-1:9092,LISTENER_LOCAL://localhost:19092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,LISTENER_LOCAL:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_COMPRESSION_TYPE: producer
+    networks:
+      - ${GLOBAL_NETWORK:-kafka}
+  kafka-broker-2:
+    image: confluentinc/cp-kafka:${KAFKA_VERSION}
+    hostname: kafka-broker-2
+    ports:
+      - "29092:29092"
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_BROKER_ID: 2
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka-broker-2:9092,LISTENER_LOCAL://localhost:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,LISTENER_LOCAL:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_COMPRESSION_TYPE: producer
+    networks:
+      - ${GLOBAL_NETWORK:-kafka}
+  kafka-broker-3:
+    image: confluentinc/cp-kafka:${KAFKA_VERSION}
+    hostname: kafka-broker-3
+    ports:
+      - "39092:39092"
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_BROKER_ID: 3
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka-broker-3:9092,LISTENER_LOCAL://localhost:39092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,LISTENER_LOCAL:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_COMPRESSION_TYPE: producer
+    networks:
+      - ${GLOBAL_NETWORK:-kafka}

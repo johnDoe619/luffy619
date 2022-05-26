@@ -1,0 +1,14 @@
+# Common yml is the common network driver type
+#when we run a compose file, we include this common file, so it will set the network type as bridge
+# in docker terminology, a bridge network uses a Sofaer Bridge
+# which allows containers connect to the same bridge network to communicate
+# while preventing other containers to reach the network
+# containers on different bridege networks cannot communicate directly wieh each other since the bridege driver create rules to prevent this communication
+# if you dont set a brige network a default network will be created
+# and on the default bridge network containers can only access each other by usign IP address
+# but with a user defined brige network containers can be result using hostnames, which is more handy to use instead of ip addresss because ip has a dynamic structure and can change intime
+version: '3.7'
+
+networks:
+  application:
+    driver: bridge
