@@ -33,7 +33,8 @@ public class TwitterKafkaStatusListener extends StatusAdapter {
         LOG.info("Received status text {} sending to kafka topic {}", status.getText(), kafkaConfigData.getTopicName());
         // convert status object to twitterAvroModel, cuz we need to send it to kafka
         TwitterAvroModel twitterAvroModel = twitterStatusToAvroTransformer.getTwitterAvroModelFromStatus(status);
-        // for message we just send the twitterAvroModel object
+        // for
+        // message we just send the twitterAvroModel object
         // we use getUserId as key, cuz we want to partition the data using a userId field of TwitterAvroModel object
         kafkaProducer.send(kafkaConfigData.getTopicName(), twitterAvroModel.getUserId(), twitterAvroModel);
 

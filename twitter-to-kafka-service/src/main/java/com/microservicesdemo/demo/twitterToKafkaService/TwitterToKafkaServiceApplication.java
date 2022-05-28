@@ -7,13 +7,22 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
 
 @SpringBootApplication
+// this annotiaiton is just a collection of 3 annotation
+// from this root class we will be looking for all components
+// which is done by @ComponentScan, this will scan for comppoentnts for beans to include in applicationCOntext until startup
+
 // this basepackage component scan is required to allow finding the spring beans in other modules
 // when a spring boot modules starts by default it scans the packages starting from the package dir that the spring boot main application resides
 // so when we work with multiple modles there will be some spring beans that resides in differnet packages
@@ -55,7 +64,10 @@ public class TwitterToKafkaServiceApplication implements CommandLineRunner {
     }
 
     public static void main(String[] args) {
-        SpringApplication.run(TwitterToKafkaServiceApplication.class, args);
+       ApplicationContext applicationContext = SpringApplication.run(TwitterToKafkaServiceApplication.class, args);
+       for (String beanName: applicationContext.getBeanDefinitionNames()) {
+           System.out.println(beanName);
+       }
     }
     // this will have the initialization logic in run method
     @Override
