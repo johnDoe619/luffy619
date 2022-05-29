@@ -1,0 +1,11 @@
+spring:
+  application:
+    name: twitter-to-kafka-service
+  profiles:
+    active: twitter_to_active
+  # finally we specify the config name, twitterTokafkaService, config-client
+  cloud:
+    config:
+      # here config-client prefix is imporant, cuz we use this prefix in the configuration files of config server repo
+      name: twitter-to-kafka-service,config-client
+      uri: http://localhost:8888

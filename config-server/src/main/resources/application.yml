@@ -1,0 +1,8 @@
+server:
+  port: 8888
+
+logging:
+  level:
+    ROOT: INFO
+    # we want to see whats happening under the hood in config server
+    org.spring.framework.cloud.config: DEBUG

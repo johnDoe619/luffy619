@@ -64,10 +64,10 @@ public class TwitterToKafkaServiceApplication implements CommandLineRunner {
     }
 
     public static void main(String[] args) {
-       ApplicationContext applicationContext = SpringApplication.run(TwitterToKafkaServiceApplication.class, args);
-       for (String beanName: applicationContext.getBeanDefinitionNames()) {
-           System.out.println(beanName);
-       }
+       SpringApplication.run(TwitterToKafkaServiceApplication.class, args);
+//       for (String beanName: applicationContext.getBeanDefinitionNames()) {
+//           System.out.println(beanName);
+//       }
     }
     // this will have the initialization logic in run method
     @Override

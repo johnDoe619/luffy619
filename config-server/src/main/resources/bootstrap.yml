@@ -1,0 +1,11 @@
+spring:
+  application:
+    name: configserver
+  cloud:
+    config:
+      server:
+        git:
+          uri: file://C:/Development/EventDrivenMicroservices/microservices-demo/config-server-repository
+          # configuration server to clone the config repo on the startup
+          clone-on-start: true
+      fail-fast: true
