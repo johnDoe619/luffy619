@@ -8,4 +8,5 @@ spring:
           uri: file://C:/Development/EventDrivenMicroservices/microservices-demo/config-server-repository
           # configuration server to clone the config repo on the startup
           clone-on-start: true
+          default-label: main
       fail-fast: true
